@@ -1,0 +1,9 @@
+*.txt
+*.data
+*.pyc
+.idea
+*.log
+*data
+__pycache__
+tensorboard
+checkpoints
