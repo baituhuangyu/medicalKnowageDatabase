@@ -109,8 +109,7 @@ def batch_iter(x, y, batch_size=64):
 
 def read_category():
     """读取分类目录，固定"""
-    categories = ["不孕不育", "中医科", "乳腺外科", "五官科", "产科", "传染病科", "内分泌科", "减肥", "呼吸内科", "妇科", "小儿内科", "小儿外科", "心胸外科", "心血管内科", "整形美容", "新生儿科", "普外科", "泌尿外科", "消化内科", "烧伤科", "男科", "皮肤性病科", "神经内科", "神经外科", "精神心理科", "肛肠外科", "肝胆外科", "肾内科", "肿瘤科", "胃肠外科", "血液科", "血管外科", "风湿免疫科", "骨科"]
-
+    categories = ["不孕不育", "中医科", "乳腺外科", "五官科", "产科", "传染病科", "内分泌科", "减肥", "呼吸内科", "妇科", "小儿内科", "小儿外科", "小儿精神科", "心胸外科", "心血管内科", "整形美容", "新生儿科", "普外科", "泌尿外科", "消化内科", "烧伤科", "男科", "皮肤性病科", "神经内科", "神经外科", "精神心理科", "肛肠外科", "肝胆外科", "肾内科", "肿瘤科", "胃肠外科", "血液科", "血管外科", "风湿免疫科", "骨科"]
     categories = [native_content(x) for x in categories]
 
     cat_to_id = dict(zip(categories, range(len(categories))))
@@ -145,10 +144,11 @@ def gen_model_data():
                 department = a_dict["department"]
                 department_set.add(department)
 
-                mation = a_dict["mation"]
+                # mation = a_dict["mation"]
                 ask_hid_txt = a_dict["ask_hid_txt"]
 
-                a_new_line_content = (mation + "。" + ask_hid_txt).replace("\t", "")
+                a_new_line_content = ask_hid_txt.replace("\t", "")
+                # a_new_line_content = (mation + "。" + ask_hid_txt).replace("\t", "")
                 new_line = department + "\t" + a_new_line_content + "\n"
                 # new_line = str(new_line)
                 if a_new_line_content not in line_set:
@@ -194,4 +194,4 @@ def gen_vocab():
 
 if __name__ == '__main__':
     gen_model_data()
-    # gen_vocab()
+    gen_vocab()

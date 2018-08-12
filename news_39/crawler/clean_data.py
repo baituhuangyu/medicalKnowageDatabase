@@ -25,7 +25,7 @@ ask_page_list = os.listdir(ask_dir)
 def get_all_page():
     with open("../data/index/index.json", "r") as fp:
         all_index = json.loads(fp.read())
-    all_index_url = [_[0].strip(u"：") for _ in all_index]
+    all_index_url = [_[0].strip(u"：").strip() for _ in all_index]
     return all_index_url
 
 
@@ -36,11 +36,11 @@ def parse_content(a_json):
     a_dict = json.loads(a_json)
     question_title = a_dict.get("question_title")
     question_detail = a_dict.get("question_detail")
-    ask_selected = a_dict.get("ask_selected")
+    # ask_selected = a_dict.get("ask_selected")
 
     question_title_soup = BeautifulSoup(question_title, "html5lib")
     question_detail_soup = BeautifulSoup(question_detail, "html5lib")
-    ask_selected_soup = BeautifulSoup(ask_selected, "html5lib")
+    # ask_selected_soup = BeautifulSoup(ask_selected, "html5lib")
 
     title_keys = [_.get_text().strip(u"：") for _ in question_title_soup.find_all("a")]
     title_keys = title_keys[1:] if len(title_keys) > 1 else title_keys
@@ -67,6 +67,8 @@ def parse_content(a_json):
 
 def clean_data():
     for a_f_name in ask_page_list:
+        import pdb
+        pdb.set_trace()
         print(a_f_name)
         a_f_name_path = os.path.join(ask_dir, a_f_name)
         save_fp = codecs.open(os.path.join(clean_data_dir, a_f_name), "w+", "utf-8")
