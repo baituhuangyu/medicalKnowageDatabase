@@ -10,7 +10,7 @@ class TRNNConfig(object):
     # 模型参数
     embedding_dim = 64      # 词向量维度
     seq_length = 600        # 序列长度
-    num_classes = 35        # 类别数
+    num_classes = 45        # 类别数
     vocab_size = 5000       # 词汇表达小
 
     num_layers= 2           # 隐藏层层数
