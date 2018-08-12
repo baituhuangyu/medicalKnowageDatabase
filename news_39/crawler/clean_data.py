@@ -67,8 +67,6 @@ def parse_content(a_json):
 
 def clean_data():
     for a_f_name in ask_page_list:
-        import pdb
-        pdb.set_trace()
         print(a_f_name)
         a_f_name_path = os.path.join(ask_dir, a_f_name)
         save_fp = codecs.open(os.path.join(clean_data_dir, a_f_name), "w+", "utf-8")
