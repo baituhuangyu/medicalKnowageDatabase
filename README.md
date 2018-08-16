@@ -1,4 +1,4 @@
-# medicalKnowageDatabase
+# medicalKnowledgeDatabase
 
 ## 计划包含以下部分
 ### 数据收集代码。
