@@ -12,18 +12,18 @@ import numpy as np
 import tensorflow as tf
 from sklearn import metrics
 
-from cnn_model_aa import TCNNConfig, TextCNN
-from lstm_aa import read_vocab, read_category, batch_iter, process_file
+from cnn_model_bb import TCNNConfig, TextCNN
+from lstm_bb import read_vocab, read_category, batch_iter, process_file
 
 
 this_file_path = os.path.dirname(__file__)
 prj_path = os.path.join(this_file_path, os.pardir)
 clean_data_dir = os.path.join(prj_path, "data/clean_data")
-train_data_dir = os.path.join(prj_path, "data/train_data")
+train_data_dir = os.path.join(prj_path, "data/train_data_2")
 
-train_dir = os.path.join(train_data_dir, 'train_data.txt')
+train_dir = os.path.join(train_data_dir, 'train_data.csv')
 # test_dir = os.path.join(base_dir, 'cnews.test.txt')
-val_dir = os.path.join(train_data_dir, 'val.txt')
+val_dir = os.path.join(train_data_dir, 'train_data.csv')
 vocab_dir = os.path.join(train_data_dir, 'vocab.txt')
 
 save_dir = 'checkpoints/textcnn'

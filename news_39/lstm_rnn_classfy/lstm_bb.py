@@ -11,7 +11,6 @@ from collections import Counter
 
 import numpy as np
 import tensorflow.contrib.keras as kr
-
 import csv
 
 if sys.version_info[0] > 2:
@@ -23,10 +22,10 @@ else:
 
 this_file_path = os.path.dirname(__file__)
 prj_path = os.path.join(this_file_path, os.pardir)
-clean_data_dir = os.path.join(prj_path, "data/clean_data")
-train_data_dir = os.path.join(prj_path, "data/train_data")
+# clean_data_dir = os.path.join(prj_path, "data/clean_data")
+train_data_dir = os.path.join(prj_path, "data/train_data_2")
 
-clean_data_list = os.listdir(clean_data_dir)
+# clean_data_list = os.listdir(clean_data_dir)
 
 
 def native_word(word, encoding='utf-8'):
@@ -56,17 +55,28 @@ def read_file(filename):
     """读取文件数据"""
     contents, labels = [], []
     with open_file(filename) as f:
-        for line in f:
-            try:
-                label, content = line.strip().split('\t')
-                if content:
-                    # contents.append(list(native_content(content)))
-                    content_list = json.loads(content)
-                    if len(content_list) > 2:
-                        contents.append(content_list[0:2] + list(set(content_list[2:])))
-                        labels.append(native_content(label))
-            except:
-                pass
+        # for line in f:
+        #     try:
+        #         label, content = line.strip().split('\t')
+        #         if content:
+        #             contents.append(list(native_content(content)))
+        #             labels.append(native_content(label))
+        #     except:
+        #         pass
+        reader = csv.reader(f)
+        # rows = [row for row in reader]
+        for row in reader:
+            row4 = eval(row[4])
+            ws = []
+            for w in row4:
+                w = w.replace(" ", "，").replace("、", "，")
+                if " " in w:
+                    ws += w.split("，")
+
+            new_line = list(set([row[2], row[3]] + ws))
+            contents.append(new_line)
+            labels.append(row[5])
+
     return contents, labels
 
 
@@ -114,7 +124,9 @@ def batch_iter(x, y, batch_size=64):
 
 def read_category():
     """读取分类目录，固定"""
-    categories = ["不孕不育", "中医内科", "中医妇科", "中医科", "中医骨伤", "乳腺外科", "产科", "其他传染病", "内分泌科", "减肥", "口腔科", "呼吸内科", "妇科", "寄生虫科", "小儿内科", "小儿外科", "小儿精神科", "心胸外科", "心血管内科", "性病科", "整形美容", "新生儿科", "普外科", "泌尿外科", "消化内科", "烧伤科", "男科", "皮肤科", "眼科", "神经内科", "神经外科", "精神心理科", "结核科", "耳鼻喉科", "肛肠外科", "肝病科", "肝胆外科", "肾内科", "肿瘤科", "胃肠外科", "血液科", "血管外科", "针灸推拿", "风湿免疫科", "骨科"]
+    # categories = ["不孕不育", "中医内科", "中医妇科", "中医科", "中医骨伤", "乳腺外科", "产科", "其他传染病", "内分泌科", "减肥", "口腔科", "呼吸内科", "妇科", "寄生虫科", "小儿内科", "小儿外科", "小儿精神科", "心胸外科", "心血管内科", "性病科", "整形美容", "新生儿科", "普外科", "泌尿外科", "消化内科", "烧伤科", "男科", "皮肤科", "眼科", "神经内科", "神经外科", "精神心理科", "结核科", "耳鼻喉科", "肛肠外科", "肝病科", "肝胆外科", "肾内科", "肿瘤科", "胃肠外科", "血液科", "血管外科", "针灸推拿", "风湿免疫科", "骨科"]
+
+    categories = ["中医全科", "乳腺外科", "产科", "体检与保健", "内分泌科", "口腔科", "呼吸内科", "妇科", "心胸外科", "心血管内科", "急诊科", "性病科", "新生儿科/儿科", "普通外科", "泌尿外科", "消化内科", "烧伤整形科", "生殖医学科", "皮肤科", "眼科", "神经内科", "神经外科", "美容科", "耳鼻喉科", "肛肠科", "肝胆外科", "肾内科", "肿瘤内/外科", "药品咨询", "血液科", "血管外科", "风湿免疫科", "骨科"]
 
     categories = [native_content(x) for x in categories]
 
@@ -151,17 +163,12 @@ def gen_model_data():
                 department_set.add(department)
 
                 # mation = a_dict["mation"]
-                # ask_hid_txt = a_dict["ask_hid_txt"]
+                ask_hid_txt = a_dict["ask_hid_txt"]
 
+                a_new_line_content = ask_hid_txt.replace("\t", "")
                 # a_new_line_content = (mation + "。" + ask_hid_txt).replace("\t", "")
-                # new_line = department + "\t" + a_new_line_content + "\n"
-                # new_line = str(new_line)
-
-                sex = a_dict["sex"]
-                age = a_dict["age"]
-                label = json.loads(a_dict["label"])
-                a_new_line_content = json.dumps([sex, age]+label, ensure_ascii=False)
                 new_line = department + "\t" + a_new_line_content + "\n"
+                # new_line = str(new_line)
                 if a_new_line_content not in line_set:
                     # pdb.set_trace()
                     # all_new_line.append(new_line)
@@ -185,23 +192,30 @@ def gen_model_data():
 
 def gen_vocab():
     vocab_size = 50000000
-    train_data_path = os.path.join(train_data_dir, "train_data.txt")
+    train_data_path = os.path.join(train_data_dir, "train_data.csv")
     vocab_path = os.path.join(train_data_dir, "vocab.txt")
-    all_lines = []
-
+    lines = []
+    department_set = set()
     with codecs.open(train_data_path, "r", "utf-8") as fp:
-        lines = fp.readlines()
-        # reader = csv.reader(fp)
-        # rows = [row for row in reader]
-        for line in lines:
-            all_lines.extend(json.loads(line.split("\t")[1]))
+        # lines = fp.readlines()
+        reader = csv.reader(fp)
+        rows = [row for row in reader]
+        for row in rows:
+            department_set.add(row[5])
+            lines.append(row[2])
+            lines.append(row[3])
+            row4 = eval(row[4])
+            ws = []
+            for w in row4:
+                w = w.replace(" ", "，").replace("、", "，")
+                if " " in w:
+                    ws += w.split("，")
+            lines.extend(ws)
 
+    all_data = lines
 
-    # all_data = []
     # for content in lines:
-    # #     all_data.extend(content)
-
-    all_data = all_lines
+    #     all_data.extend(content)
 
     counter = Counter(all_data)
     count_pairs = counter.most_common(vocab_size - 1)
@@ -211,6 +225,7 @@ def gen_vocab():
     words_str = '\n'.join(words) + '\n'
     codecs.open(vocab_path, 'w', "utf-8").write(words_str)
 
+    print(json.dumps(sorted(list(department_set)), ensure_ascii=False))
 
 if __name__ == '__main__':
     # gen_model_data()
