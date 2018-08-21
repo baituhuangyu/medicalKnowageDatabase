@@ -3,6 +3,8 @@ import json
 import codecs
 import tensorflow as tf
 
+saved_model_dir = os.path.join(os.path.abspath(__file__), os.pardir, "ner_model")
+
 
 class PredictNer(object):
     def __init__(self, saved_model, source_data):
@@ -24,7 +26,7 @@ class PredictNer(object):
     @staticmethod
     def __load_chinese_vocab():
         cv = dict()
-        with codecs.open(os.path.join(os.path.dirname(__file__), "data/all_data/chinese_vocab.txt"), "r", "utf8") as f:
+        with codecs.open(os.path.join(os.path.dirname(__file__), os.pardir, "data/all_data/chinese_vocab.txt"), "r", "utf8") as f:
             for i, line in enumerate(f.readlines()):
                 cv[line.strip()] = i
         return cv
@@ -48,23 +50,24 @@ class PredictNer(object):
         result_ner = []
         for i in range(len(decode_tags)):
             sentence_ner = []
+            word_ner = []
             for j in range(len(decode_tags[i])):
-                if decode_tags[i].tolist()[j] == 0:
-                    continue
-                sentence_ner.append(self.source_data[i].tolist()[j])
-            result_ner.append(sentence_ner)
+                if decode_tags[i].tolist()[j] != 0:
+                    word_ner.append(self.source_data[i][j])
+                elif decode_tags[i].tolist()[j-1] == 3:
+                    if len(word_ner) != 0:
+                        sentence_ner.append("".join(word_ner))
+                        word_ner = []
+            else:
+                result_ner.append(sentence_ner)
         return result_ner
 
 
 if __name__ == "__main__":
     content = [
-        "美国Groupon公司曾经是团购商业模式的发明者和行业龙头，曾经引发中国市场的百团大战、千团大战。不过这家公司如今陷入了"
-        "寻求变卖的困境中。据外媒最新消息，Groupon迎来又一个坏消息，法庭裁决该公司侵犯了IBM的电子商务专利，必须赔偿8250万"
-        "美元。",
-        "美国Groupon公司曾经是团购商业模式的发明者和行业龙头，曾经引发中国市场的百团大战、千团大战。不过这家公司如今陷入了"
-        "寻求变卖的困境中。据外媒最新消息，Groupon迎来又一个坏消息，法庭裁决该公司侵犯了IBM的电子商务专利，必须赔偿8250万"
-        "美元。"
+        "隐匿性肾炎，你好医生，尿蛋白正常，隐血+号，红细胞20几个，这种病补充提问：是没法医的吗补充提问：有胡桃夹",
+        "昨天下午开始感觉喉咙有点干，有点痛，今天还是一样，傍晚开始，全身抹起来都痛，除了四肢。早几天早上被尿憋醒，尿了很久，尿完感觉阴道有点微痛，之后几天尿完都会有点微痛的症状，尿有点黄，是尿毒症吗，还是感冒了",
     ]
-    ner = PredictNer("model", content)
+    ner = PredictNer("ner_model", content)
     pred = ner.batch_predict_ner()
     print(json.dumps(pred, indent=2, ensure_ascii=False))

@@ -18,7 +18,8 @@ def build_nodes():
 
     department_set = set()
     label_set = set()
-    department_label_set = set()
+    # department_label_set = set()
+    department_label_dict = dict()
 
     with codecs.open(train_data_path, "r", "utf-8") as fp:
         lines = fp.readlines()
@@ -35,8 +36,9 @@ def build_nodes():
             for a_label in a_label_list:
                 a_label = a_label.replace(",", "")
                 a_new_line = a_department + "," + a_label
-                if a_new_line not in department_label_set:
-                    department_label_set.add(a_new_line)
+                # if a_new_line not in department_label_dict:
+                count_department_label = department_label_dict.get(a_new_line, 0)
+                department_label_dict[a_new_line] = count_department_label + 1
 
                 if a_label not in label_set:
                     label_set.add(a_label)
@@ -48,7 +50,8 @@ def build_nodes():
         label_path_fp.write("\n".join(list(label_set)))
 
     with codecs.open(department_label_path, "w+") as department_label_path_fp:
-        department_label_path_fp.write("\n".join(list(department_label_set)))
+        department_label_sorted = sorted(department_label_dict.items(), key=lambda _: _[1], reverse=True)
+        department_label_path_fp.write("\n".join(["%s,%s" % _ for _ in department_label_sorted]))
 
 
 build_nodes()
