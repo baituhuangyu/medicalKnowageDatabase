@@ -9,3 +9,4 @@ tensorboard
 checkpoints
 *.tar.gz
 *.csv
+*.DS_Store
