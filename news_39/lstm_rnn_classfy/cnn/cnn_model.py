@@ -58,7 +58,7 @@ class DataPreClass(object):
         else:
             self.file_path = self.test_data_fp
 
-        self.batch_size = 64
+        self.batch_size = 1
 
         labels = ["不孕不育", "中医内科", "中医妇科", "中医科", "中医骨伤", "乳腺外科", "产科", "其他传染病", "内分泌科", "减肥", "口腔科", "呼吸内科", "妇科", "寄生虫科", "小儿内科", "小儿外科", "小儿精神科", "心胸外科", "心血管内科", "性病科", "整形美容", "新生儿科", "普外科", "泌尿外科", "消化内科", "烧伤科", "男科", "皮肤科", "眼科", "神经内科", "神经外科", "精神心理科", "结核科", "耳鼻喉科", "肛肠外科", "肝病科", "肝胆外科", "肾内科", "肿瘤科", "胃肠外科", "血液科", "血管外科", "针灸推拿", "风湿免疫科", "骨科"]
 
@@ -300,12 +300,70 @@ class TextCNN(object):
                 break
 
 
+class PredictModel(object):
+    def __init__(self):
+        self.checkpointDir = "model/cnn/"
+        self.chinese_vocab_fp = os.path.join(this_file_path, '../../data/all_data/chinese_vocab.txt')
+        labels = ["不孕不育", "中医内科", "中医妇科", "中医科", "中医骨伤", "乳腺外科", "产科", "其他传染病", "内分泌科", "减肥", "口腔科", "呼吸内科", "妇科",
+                  "寄生虫科", "小儿内科", "小儿外科", "小儿精神科", "心胸外科", "心血管内科", "性病科", "整形美容", "新生儿科", "普外科", "泌尿外科", "消化内科",
+                  "烧伤科", "男科", "皮肤科", "眼科", "神经内科", "神经外科", "精神心理科", "结核科", "耳鼻喉科", "肛肠外科", "肝病科", "肝胆外科", "肾内科",
+                  "肿瘤科", "胃肠外科", "血液科", "血管外科", "针灸推拿", "风湿免疫科", "骨科"]
+
+        self.labels_map = dict([(idx, str(v)) for idx, v in enumerate(labels)])
+        self.vocab_map = self.read_vocab_map()
+
+    def read_vocab_map(self):
+        with open(self.chinese_vocab_fp, "r") as fp:
+            print("open read_vocab_map")
+            vocab_list = fp.readlines()
+            vocab_list = [_.strip() for _ in vocab_list]
+
+        return dict([(str(v), idx) for idx, v in enumerate(vocab_list)])
+
+    def _encode_content(self, content_list):
+        encode_content_list = []
+        for sentence in content_list:
+            if len(sentence) >= 400:
+                sentence = sentence[:400]
+            else:
+                sentence = sentence + " " * (400 - len(sentence))
+            content_idx = [self.vocab_map.get(str(k), 0) for k in sentence]
+            encode_content_list.append(np.array(content_idx).reshape(-1, 400))
+
+        return np.array(encode_content_list, dtype=np.int32).reshape(-1, 400)
+
+    def __cnn_by_meta_graph(self):
+        checkpoint_file = tf.train.latest_checkpoint(self.checkpointDir)
+        graph = tf.Graph()
+        with graph.as_default():
+            self.sess = tf.Session()
+            with self.sess.as_default():
+                saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
+                saver.restore(self.sess, checkpoint_file)
+                self.input_x = graph.get_operation_by_name("input_x").outputs[0]
+                self.dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
+                self.predictions = graph.get_operation_by_name("output/predictions").outputs[0]
+
+    def cnn_predict_by_meta_graph(self, content_list):
+        input_batch = self._encode_content(content_list)
+        self.__cnn_by_meta_graph()
+        batch_predictions = self.sess.run(self.predictions, {self.input_x: input_batch, self.dropout_keep_prob: 1.0})
+        return [self.labels_map[_] for _ in batch_predictions]
+
+
 if __name__ == '__main__':
     # make_train_test_data()
     # exit(0)
 
-    cnn_model = TextCNN(sequence_length=400, num_classes=45, vocab_size=6020,
-                        embedding_size=128, filter_sizes=[3, 6, 9], num_filters=48)
+    # cnn_model = TextCNN(sequence_length=400, num_classes=45, vocab_size=6020,
+    #                     embedding_size=128, filter_sizes=[3, 6, 9], num_filters=256)
+    #
+    # cnn_model.train()
+    # cnn_model.test()
+    content = [
+        "双肾体积偏小,大小分别约为8.67×2.68cm(右），8.81×3.71（左），形态尚正常，左肾中部实质可见一强回声斑，大小约为0.33×0.23cm，右肾实质及双肾窦回声正常。",
+    ]
 
-    cnn_model.train()
-    cnn_model.test()
+    pm = PredictModel()
+    predict_result = pm.cnn_predict_by_meta_graph(content)
+    print(json.dumps(predict_result, indent=4, ensure_ascii=False))
