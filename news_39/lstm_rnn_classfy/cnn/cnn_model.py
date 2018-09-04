@@ -7,8 +7,9 @@ import random
 import copy
 import os
 import json
-import sys
 import random
+
+import sys
 
 if sys.version_info[0] > 2:
     is_py3 = True
@@ -58,7 +59,7 @@ class DataPreClass(object):
         else:
             self.file_path = self.test_data_fp
 
-        self.batch_size = 1
+        self.batch_size = 128
 
         labels = ["不孕不育", "中医内科", "中医妇科", "中医科", "中医骨伤", "乳腺外科", "产科", "其他传染病", "内分泌科", "减肥", "口腔科", "呼吸内科", "妇科", "寄生虫科", "小儿内科", "小儿外科", "小儿精神科", "心胸外科", "心血管内科", "性病科", "整形美容", "新生儿科", "普外科", "泌尿外科", "消化内科", "烧伤科", "男科", "皮肤科", "眼科", "神经内科", "神经外科", "精神心理科", "结核科", "耳鼻喉科", "肛肠外科", "肝病科", "肝胆外科", "肾内科", "肿瘤科", "胃肠外科", "血液科", "血管外科", "针灸推拿", "风湿免疫科", "骨科"]
 
