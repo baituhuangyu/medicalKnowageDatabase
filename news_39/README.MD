@@ -4,10 +4,9 @@
 ## 知识图谱 data_base
 ## 实体抽取 ner_model
 
-## 分类涉及CNN、attention
+## 分类涉及CNN、rnn+attention
 
 # TODO
-- attention
 - seq2seq
 
 — [目录结构](tree_project.MD)
