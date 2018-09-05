@@ -10,3 +10,10 @@
 - seq2seq
 
 — [目录结构](tree_project.MD)
+
+cnn 结果
+![cnn 结果](https://github.com/baituhuangyu/medicalKnowledgeDatabase/blob/master/news_39/lstm_rnn_classfy/cnn_test_acc.png) 
+
+
+rnn+attention 结果
+![rnn+attention 结果](https://github.com/baituhuangyu/medicalKnowledgeDatabase/blob/master/news_39/lstm_rnn_classfy/rnn_attention_test_acc.png) 
