@@ -1,0 +1,7 @@
+select * from Company where primary_id=="D56FE37A2DEDC6E86E9A80A187243345" limit 5
+SELECT * FROM Person-(PersonPosition)->Company WHERE from_id=="00E72C36BA69F3AB69C79F5729D1F35E"
+
+
+select * from Person limit 10
+
+SELECT * FROM Person-(*)->Company WHERE from_id=="00E72C36BA69F3AB69C79F5729D1F35E"
