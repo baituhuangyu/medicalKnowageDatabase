@@ -1,0 +1,14 @@
+---- Global vertices, edges, and all graphs
+Vertex Types:
+  - VERTEX Company(PRIMARY_ID companyId STRING, companyName STRING, regCap STRING, regCapCur STRING, status STRING, esDate STRING, auditDate STRING) WITH STATS="OUTDEGREE_BY_EDGETYPE"
+  - VERTEX Person(PRIMARY_ID personId STRING, person STRING) WITH STATS="OUTDEGREE_BY_EDGETYPE"
+Edge Types:
+  - DIRECTED EDGE PersonInvestToCompany(FROM Person, TO Company, invConum STRING, ratio STRING, regCapCur STRING, conDate STRING)
+  - DIRECTED EDGE PersonLegal(FROM Person, TO Company, position STRING)
+  - DIRECTED EDGE PersonPosition(FROM Person, TO Company, position STRING)
+  - DIRECTED EDGE CompanyInvestToCompany(FROM Company, TO Company, invConum STRING, ratio STRING, regCapCur STRING, conDate STRING)
+  - DIRECTED EDGE CompanyPartnerCompany(FROM Company, TO Company, position STRING)
+
+Graphs:
+  - Graph MyGraph(Company:v, Person:v, PersonInvestToCompany:e, PersonLegal:e, PersonPosition:e, CompanyInvestToCompany:e, CompanyPartnerCompany:e)
+Jobs:
