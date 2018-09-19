@@ -6,8 +6,10 @@
 
 ## 分类涉及CNN、rnn+attention
 
+## 问答seq2seq（testting）
+
 # TODO
-- seq2seq
+- 
 
 — [目录结构](tree_project.MD)
 
